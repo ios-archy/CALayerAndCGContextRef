@@ -43,22 +43,39 @@
     @property(copy) NSString *type;
     */
     
-    CAGradientLayer * layer = [CAGradientLayer layer];
-    layer.colors = @[(id)[UIColor whiteColor].CGColor,(id)[UIColor blueColor].CGColor,(id)[UIColor greenColor].CGColor];
+    // 创建曲线,绘制圆形path
+    UIBezierPath *circlePath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(self.view.center.x, self.view.center.y) radius:100 startAngle:M_PI endAngle:-M_PI clockwise:NO];
+    // 创建shapeLayer
+    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
+    shapeLayer.frame = self.view.bounds;// 设置图层大小
+    shapeLayer.path = circlePath.CGPath;// 设置shapeLayer的cgPath
+    shapeLayer.opacity = 1.0f;  //设置透明度0~1之间
+    shapeLayer.lineCap = kCALineCapRound;//制定线的边缘是圆形
+    shapeLayer.lineWidth = 5.0f; // 设置线宽
+    shapeLayer.strokeColor = [UIColor lightGrayColor].CGColor;// 设置线条颜色
+    [shapeLayer setFillColor:[UIColor clearColor].CGColor]; // 清楚填充颜色
+    [self.view.layer addSublayer:shapeLayer];
     
-    layer.locations = @[@0.1,@0.5,@1];
-    layer.bounds = CGRectMake(0, 0, 100, 100);
-    layer.position = CGPointMake(50, 50);
-    layer.startPoint = CGPointMake(0, 0);
-    layer.endPoint = CGPointMake(1, 1);
-    //[self.view.layer addSublayer:layer];
+    // 创建颜色数组
+    NSMutableArray *colors = [NSMutableArray array];
+    for (NSInteger hue = 0; hue <= 360; hue += 5)
+    {
+        UIColor * color = [UIColor colorWithHue:1.0 * hue / 360
+                                     saturation:1.0
+                                     brightness:1.0
+                                          alpha:1.0];
+        [colors addObject:(id)[color CGColor]];
+    }
     
     
-    UIView * view = [[UIView alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
-    view.layer.cornerRadius = 50;
-    view.clipsToBounds = YES;
-    [self.view addSubview:view];
-    [view.layer addSublayer:layer];
+    CAGradientLayer *grandient = [CAGradientLayer layer];
+    grandient.frame = self.view.bounds;//设置颜色渐变的layer的frame
+    grandient.colors = colors;//颜色数组
+    grandient.mask = shapeLayer;//设置mask图层
+    //开始和结束点可以用来做隐式动画
+    grandient.startPoint = CGPointMake(0, 0);//开始点
+    grandient.endPoint = CGPointMake(1, 0);//结束点
+    [self.view.layer addSublayer:grandient];
     
     
 }
